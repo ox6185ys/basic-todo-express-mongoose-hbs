@@ -15,6 +15,7 @@ router.get('/', function(req, res, next) {
 });
 
 
+
 /* GET all completed tasks. */
 router.get('/completed', function(req, res, next){
 
@@ -28,11 +29,10 @@ router.get('/completed', function(req, res, next){
 });
 
 
-/* Mark a task as done. Task _id should be provided as a body parameter */
-router.post('tasks/alldone', function(req, res, next){
+/* Mark all tasks as done. */
+router.post('/alldone', function(req, res, next){
 
-  var id = req.body._id;
-  Task.findByIdAndUpdate(id, {completed:true}, function(err){
+  Task.update( {completed:false}, {completed:true}, {multi:true}, function(err){
 
     if (err) {
       return next(err);
@@ -44,6 +44,19 @@ router.post('tasks/alldone', function(req, res, next){
   });
 });
 
+
+
+
+/* Show details of one task */
+router.get('/task/:id', function(req, res, next){
+
+  Task.findById(req.params.id, function(err, task){
+    if (err) {
+      return next(err);
+    }
+    return res.render('task_detail', {task:task})
+  })
+});
 
 
 /* POST Add new task, then redirect to task list */
@@ -69,7 +82,7 @@ router.post('/add', function(req, res, next){
 });
 
 
-/* Mark a task as done. Task _id should be provided as body parameter */
+/* Mark a task as done. Task _id should be provided as req.body parameter */
 router.post('/done', function(req, res, next){
 
   var id = req.body._id;
@@ -98,16 +111,10 @@ router.post('/delete', function(req, res,next){
 
   var id = req.body._id;
 
-  Task.findByIdAndRemove(id, function(err, task){
+  Task.findByIdAndRemove(id, function(err){
 
     if (err) {
       return next(err);    // For database errors
-    }
-
-    if (!task) {
-      var req_err = new Error('Task not found');
-      req_err.status = 404;
-      return next(req_err);     // Task not found error
     }
 
     req.flash('info', 'Deleted');
