@@ -14,6 +14,7 @@
     "express-handlebars": "~3.0.0",
     "express-session": "^1.15.1",
     "mongodb": "^2.2.24",
+    "mongoose": "^4.8.6",
     "morgan": "~1.7.0",
     "serve-favicon": "~2.3.2"
   }

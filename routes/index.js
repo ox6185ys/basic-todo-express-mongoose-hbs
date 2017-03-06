@@ -1,12 +1,12 @@
 var express = require('express');
 var router = express.Router();
-var ObjectID = require('mongodb').ObjectID;
+var Task = require('../models/task.js');
 
 
 /* GET home page, a list of incomplete tasks . */
 router.get('/', function(req, res, next) {
 
-  req.task_col.find({completed:false}).toArray(function(err, tasks){
+  Task.find({completed:false}, function(err, tasks){
     if (err) {
       return next(err);
     }
@@ -17,19 +17,22 @@ router.get('/', function(req, res, next) {
 
 /* GET all completed tasks. */
 router.get('/completed', function(req, res, next){
-  req.task_col.find({completed:true}).toArray(function(err, tasks){
+
+  Task.find({completed:true}, function(err, tasks){
     if (err) {
       return next(err);
     }
-    res.render('tasks_completed', { title: 'Completed tasks' , tasks: tasks });
+    res.render('tasks_completed', { title: 'TODO list' , tasks: tasks });
   });
+
 });
 
 
 /* Mark a task as done. Task _id should be provided as a body parameter */
 router.post('tasks/alldone', function(req, res, next){
 
-  req.task_col.updateMany( {completed:false}, { $set: {completed : true}}, function(err, result) {
+  var id = req.body._id;
+  Task.findByIdAndUpdate(id, {completed:true}, function(err){
 
     if (err) {
       return next(err);
@@ -37,6 +40,7 @@ router.post('tasks/alldone', function(req, res, next){
 
     req.flash('info', 'All tasks are done!');
     return res.redirect('/')
+
   });
 });
 
@@ -52,14 +56,14 @@ router.post('/add', function(req, res, next){
 
   else {
     // Save new task with text provided, and completed = false
-    var task = { text : req.body.text, completed: false};
+    var task = Task({ text : req.body.text, completed: false});
 
-    req.task_col.insertOne(task, function(err, task) {
+    task.save(function(err) {
       if (err) {
         return next(err);
       }
-      res.redirect('/')
-    })
+      return res.redirect('/')
+    });
   }
 
 });
@@ -68,33 +72,39 @@ router.post('/add', function(req, res, next){
 /* Mark a task as done. Task _id should be provided as body parameter */
 router.post('/done', function(req, res, next){
 
-  req.task_col.updateOne({ _id : ObjectID(req.body._id) }, {$set : { completed : true }}, function(err, result){
+  var id = req.body._id;
+  Task.findByIdAndUpdate(id, {completed:true}, function(err, task){
 
     if (err) {
-      return next(err);    // For database errors, 500 error
+      return next(err);
     }
 
-    if (result.result.n == 0) {
+    if (!task) {
       var req_err = new Error('Task not found');
       req_err.status = 404;
       return next(req_err);     // Task not found error
     }
 
-    req.flash('info', 'Marked as completed');
+    req.flash('info', 'Task marked as done');
     return res.redirect('/')
 
-  })
+  });
 
 });
 
+
+/* Delete a task. Task _id is in req.body */
 router.post('/delete', function(req, res,next){
-  req.task_col.deleteOne({ _id : ObjectID(req.body._id) }, function(err, result){
+
+  var id = req.body._id;
+
+  Task.findByIdAndRemove(id, function(err, task){
 
     if (err) {
       return next(err);    // For database errors
     }
 
-    if (result.result.n == 0) {
+    if (!task) {
       var req_err = new Error('Task not found');
       req_err.status = 404;
       return next(req_err);     // Task not found error
@@ -104,7 +114,6 @@ router.post('/delete', function(req, res,next){
     return res.redirect('/')
 
   })
-
 });
 
 
