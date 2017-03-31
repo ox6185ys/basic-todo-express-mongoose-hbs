@@ -5,7 +5,7 @@ var Task = require('../models/task.js');
 
 /* GET home page, a list of incomplete tasks . */
 router.get('/', function(req, res, next) {
-
+// Task schema get matches.  tasks guarantees a return.
   Task.find({completed:false}, function(err, tasks){
     if (err) {
       return next(err);
@@ -13,8 +13,6 @@ router.get('/', function(req, res, next) {
     res.render('index', { title: 'TODO list' , tasks: tasks });
   });
 });
-
-
 
 /* GET all completed tasks. */
 router.get('/completed', function(req, res, next){
