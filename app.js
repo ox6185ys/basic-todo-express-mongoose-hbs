@@ -1,8 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var Task = require('../models/task.js');
-
-
+// To highlight an entire blcok type "Line number and a dash".
+Line7-
+// Yellow words are Webstorm defined.
 /* GET home page, a list of incomplete tasks . */
 router.get('/', function(req, res, next) {
 
@@ -13,8 +14,6 @@ router.get('/', function(req, res, next) {
         res.render('index', { title: 'TODO list' , tasks: tasks });
     });
 });
-
-
 
 /* GET all completed tasks. */
 router.get('/completed', function(req, res, next){
@@ -122,6 +121,4 @@ router.post('/delete', function(req, res,next){
 
     })
 });
-
-
 module.exports = router;
