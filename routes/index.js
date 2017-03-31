@@ -46,6 +46,7 @@ router.post('/alldone', function(req, res, next){
 
 
 /* Show details of one task */
+// Build the URL /task/:id
 router.get('/task/:id', function(req, res, next){
 
   Task.findById(req.params.id, function(err, task){
