@@ -17,6 +17,8 @@ var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'express-handlebars');
+
 app.set('view engine', 'hbs');
 
 var mongo_pw = process.env.MONGO_PW;

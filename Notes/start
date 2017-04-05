@@ -1,0 +1,3 @@
+load npm: npm install
+start database: mongod --dbpath ..\data
+start server: npm start or bin\wwww click and run
